@@ -9,7 +9,7 @@ import ch.heigvd.dma.bookreturnreminder.models.Book
 @Dao
 interface BookDao {
     @Insert
-    fun insert(book: Book)
+    suspend fun insert(book: Book)
 
     @Query("SELECT * FROM books ORDER BY return_date DESC")
     fun getAllByDescReturnDate(): LiveData<List<Book>>
