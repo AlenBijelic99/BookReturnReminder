@@ -7,6 +7,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import ch.heigvd.dma.bookreturnreminder.adapter.BookAdapter
 import ch.heigvd.dma.bookreturnreminder.models.Book
 import ch.heigvd.dma.bookreturnreminder.ui.BookViewModel
 
@@ -24,13 +27,12 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        bookViewModel.allBooks.observe(this) { books ->
-            books.forEach {
-                println(it)
-            }
-        }
+        val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(this)
 
-        val book = Book(code = "123", title = "My Book", author = "Author", returnDate = "2024-12-31")
-        bookViewModel.insert(book)
+        bookViewModel.allBooks.observe(this) { books ->
+            val adapter = BookAdapter(books)
+            recyclerView.adapter = adapter
+        }
     }
 }
