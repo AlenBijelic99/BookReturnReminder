@@ -7,11 +7,14 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.commit
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ch.heigvd.dma.bookreturnreminder.adapter.BookAdapter
+import ch.heigvd.dma.bookreturnreminder.fragments.InsertBookFragment
 import ch.heigvd.dma.bookreturnreminder.models.Book
 import ch.heigvd.dma.bookreturnreminder.ui.BookViewModel
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {
 
@@ -33,6 +36,14 @@ class MainActivity : AppCompatActivity() {
         bookViewModel.allBooks.observe(this) { books ->
             val adapter = BookAdapter(books)
             recyclerView.adapter = adapter
+        }
+
+        val fab: FloatingActionButton = findViewById(R.id.fab)
+        fab.setOnClickListener {
+            supportFragmentManager.commit {
+                replace(R.id.main, InsertBookFragment())
+                addToBackStack(null)
+            }
         }
     }
 }
