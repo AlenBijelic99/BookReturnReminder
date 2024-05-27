@@ -1,5 +1,6 @@
 package ch.heigvd.dma.bookreturnreminder.adapter
 
+import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +9,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import ch.heigvd.dma.bookreturnreminder.R
 import ch.heigvd.dma.bookreturnreminder.models.Book
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class BookAdapter(private val books: List<Book>) : RecyclerView.Adapter<BookAdapter.BookViewHolder>() {
 
@@ -27,6 +32,21 @@ class BookAdapter(private val books: List<Book>) : RecyclerView.Adapter<BookAdap
         holder.title.text = book.title
         holder.author.text = book.author
         holder.returnDate.text = book.returnDate
+
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        try {
+            val returnDate = dateFormat.parse(book.returnDate)
+            val currentDate = Date()
+
+            if (returnDate != null && returnDate.before(currentDate)) {
+                holder.returnDate.setTextColor(Color.RED)
+            } else {
+                holder.returnDate.setTextColor(Color.BLACK)
+            }
+        } catch (e: ParseException) {
+            Log.e("BookAdapter", "Error parsing date: ${book.returnDate}", e)
+            holder.returnDate.setTextColor(Color.BLACK)
+        }
     }
 
     override fun getItemCount(): Int {
