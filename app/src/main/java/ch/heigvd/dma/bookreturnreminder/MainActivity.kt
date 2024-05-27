@@ -2,6 +2,7 @@ package ch.heigvd.dma.bookreturnreminder
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -33,7 +34,16 @@ class MainActivity : AppCompatActivity() {
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
+        val emptyView = findViewById<TextView>(R.id.emptyView)
+
         bookViewModel.allBooks.observe(this) { books ->
+            if (books.isEmpty()) {
+                recyclerView.visibility = RecyclerView.GONE
+                emptyView.visibility = TextView.VISIBLE
+            } else {
+                recyclerView.visibility = RecyclerView.VISIBLE
+                emptyView.visibility = TextView.GONE
+            }
             val adapter = BookAdapter(books)
             recyclerView.adapter = adapter
         }
@@ -45,5 +55,8 @@ class MainActivity : AppCompatActivity() {
                 addToBackStack(null)
             }
         }
+
+        // TODO: Remove this code
+        // bookViewModel.deleteAll()
     }
 }

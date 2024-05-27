@@ -18,4 +18,10 @@ class BookViewModel(application: Application): AndroidViewModel(application) {
             bookRepository.insert(book)
         }
     }
+
+    fun deleteAll() {
+        viewModelScope.launch {
+            bookRepository.deleteAll()
+        }
+    }
 }

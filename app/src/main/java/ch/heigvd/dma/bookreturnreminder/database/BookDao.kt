@@ -11,6 +11,9 @@ interface BookDao {
     @Insert
     suspend fun insert(book: Book)
 
-    @Query("SELECT * FROM books ORDER BY return_date DESC")
-    fun getAllByDescReturnDate(): LiveData<List<Book>>
+    @Query("SELECT * FROM books ORDER BY return_date ASC")
+    fun getAllByAscReturnDate(): LiveData<List<Book>>
+
+    @Query("DELETE FROM books")
+    suspend fun deleteAll()
 }
