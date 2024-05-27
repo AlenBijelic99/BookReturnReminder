@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
     android:padding="16dp">
 
     <EditText
@@ -14,7 +15,8 @@
         android:inputType="text"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        android:padding="8dp"/>
 
     <EditText
         android:id="@+id/editTextAuthor"
@@ -25,7 +27,8 @@
         android:inputType="text"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/editTextTitle"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        android:padding="8dp"/>
 
     <EditText
         android:id="@+id/editTextReturnDate"
@@ -37,7 +40,8 @@
         android:clickable="true"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/editTextAuthor"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        android:padding="8dp"/>
 
     <Button
         android:id="@+id/buttonSave"
@@ -46,6 +50,20 @@
         android:text="@string/btn_save"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/editTextReturnDate"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toStartOf="@id/buttonCancel"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        android:layout_marginEnd="8dp"
+        android:padding="8dp"/>
+
+    <Button
+        android:id="@+id/buttonCancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_cancel"
+        app:layout_constraintTop_toBottomOf="@id/editTextReturnDate"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/buttonSave"
+        android:layout_marginStart="8dp"
+        android:padding="8dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
