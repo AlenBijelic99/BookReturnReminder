@@ -10,5 +10,5 @@ data class Book(
     @ColumnInfo(name = "isbn_code") val isbnCode: String,
     @ColumnInfo(name = "title") val title: String,
     @ColumnInfo(name = "author") val author: String,
-    @ColumnInfo(name = "return_date") val returnDate: String
+    @ColumnInfo(name = "return_date") var returnDate: String
 )

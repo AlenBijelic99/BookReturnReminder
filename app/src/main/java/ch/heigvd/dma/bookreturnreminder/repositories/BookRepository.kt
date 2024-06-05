@@ -17,4 +17,12 @@ class BookRepository(application: Application) {
     suspend fun deleteAll() {
         bookDao.deleteAll()
     }
+
+    fun getBookByIsbn(isbnCode: String): LiveData<Book> {
+        return bookDao.getBookByIsbn(isbnCode)
+    }
+
+    suspend fun update(isbnCode: String, returnDate: String) {
+        bookDao.update(isbnCode, returnDate)
+    }
 }

@@ -24,6 +24,7 @@ import java.util.concurrent.Executors
 class BarcodeScanningActivity : AppCompatActivity() {
 
     private lateinit var cameraExecutor: ExecutorService
+    private var isScanning = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,9 +58,9 @@ class BarcodeScanningActivity : AppCompatActivity() {
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
                 .also {
-                    it.setAnalyzer(cameraExecutor, { imageProxy ->
+                    it.setAnalyzer(cameraExecutor) { imageProxy ->
                         processImageProxy(barcodeScanner, imageProxy)
-                    })
+                    }
                 }
 
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
@@ -83,13 +84,17 @@ class BarcodeScanningActivity : AppCompatActivity() {
 
             barcodeScanner.process(image)
                 .addOnSuccessListener { barcodes ->
-                    for (barcode in barcodes) {
-                        if (barcode.format == Barcode.FORMAT_EAN_13 || barcode.format == Barcode.FORMAT_EAN_8) {
-                            val resultIntent = Intent().apply {
-                                putExtra("isbnCode", barcode.rawValue)
+                    if (!isScanning) {
+                        for (barcode in barcodes) {
+                            if (barcode.format == Barcode.FORMAT_EAN_13 || barcode.format == Barcode.FORMAT_EAN_8) {
+                                isScanning = true
+                                val intent = Intent(this, InsertBookActivity::class.java).apply {
+                                    putExtra("isbnCode", barcode.rawValue)
+                                }
+                                startActivity(intent)
+                                finish()
+                                break
                             }
-                            setResult(Activity.RESULT_OK, resultIntent)
-                            finish()
                         }
                     }
                 }

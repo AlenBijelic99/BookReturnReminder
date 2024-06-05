@@ -16,4 +16,10 @@ interface BookDao {
 
     @Query("DELETE FROM books")
     suspend fun deleteAll()
+
+    @Query("SELECT * FROM books WHERE isbn_code = :isbnCode LIMIT 1")
+    fun getBookByIsbn(isbnCode: String): LiveData<Book>
+
+    @Query("UPDATE books SET return_date = :returnDate WHERE isbn_code = :isbnCode")
+    suspend fun update(isbnCode: String, returnDate: String)
 }

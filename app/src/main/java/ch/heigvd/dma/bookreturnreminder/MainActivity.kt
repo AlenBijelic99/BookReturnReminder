@@ -48,17 +48,18 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+
+        // TODO: Remove this code
+        /*bookViewModel.deleteAll()
+
         val book = Book(
-            isbnCode = "978-2-21-256665-9",
+            isbnCode = "9782212566659",
             title = "Blockchain: La révolution de la confiance",
             author = "Laurent Leloup",
             returnDate = ""
         )
 
-        bookViewModel.insert(book)
-
-        // TODO: Remove this code
-        // bookViewModel.deleteAll()
+        bookViewModel.insert(book)*/
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
