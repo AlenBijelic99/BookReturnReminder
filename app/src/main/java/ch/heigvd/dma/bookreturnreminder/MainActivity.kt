@@ -61,19 +61,4 @@ class MainActivity : AppCompatActivity() {
 
         bookViewModel.insert(book)*/
     }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_scan -> {
-                // TODO: Implement barcode scanning
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
 }
