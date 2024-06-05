@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
 
         val fab: FloatingActionButton = findViewById(R.id.fab)
         fab.setOnClickListener {
-            val intent = Intent(this, InsertBookActivity::class.java)
+            val intent = Intent(this, BarcodeScanningActivity::class.java)
             startActivity(intent)
         }
 
