@@ -48,7 +48,7 @@ class InsertBookActivity : AppCompatActivity() {
 
         buttonSave.setOnClickListener {
             val book = Book(
-                code = "",
+                isbnCode = "",
                 title = editTextTitle.text.toString(),
                 author = editTextAuthor.text.toString(),
                 returnDate = editTextReturnDate.text.toString()

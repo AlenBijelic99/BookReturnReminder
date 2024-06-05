@@ -11,7 +11,7 @@ class BookViewModel(application: Application): AndroidViewModel(application) {
 
     private val bookRepository = BookRepository(application)
 
-    val allBooks = bookRepository.allBooks
+    val booksToReturn = bookRepository.booksToReturn
 
     fun insert(book: Book) {
         viewModelScope.launch {

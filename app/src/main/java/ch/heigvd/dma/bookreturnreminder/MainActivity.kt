@@ -12,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ch.heigvd.dma.bookreturnreminder.adapter.BookAdapter
+import ch.heigvd.dma.bookreturnreminder.models.Book
 import ch.heigvd.dma.bookreturnreminder.ui.BookViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
@@ -36,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        bookViewModel.allBooks.observe(this) { books ->
+        bookViewModel.booksToReturn.observe(this) { books ->
             val adapter = BookAdapter(books)
             recyclerView.adapter = adapter
         }
@@ -46,6 +47,15 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, InsertBookActivity::class.java)
             startActivity(intent)
         }
+
+        val book = Book(
+            isbnCode = "978-2-21-256665-9",
+            title = "Blockchain: La révolution de la confiance",
+            author = "Laurent Leloup",
+            returnDate = ""
+        )
+
+        bookViewModel.insert(book)
 
         // TODO: Remove this code
         // bookViewModel.deleteAll()
