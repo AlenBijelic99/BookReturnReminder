@@ -57,3 +57,33 @@ We only use the ISBN to identify the book. We do not use the information to retr
 The application uses a foreground service that detects iBeacon device representing the library. When the user is near the library, a notification is sent to the user with a list of books that are due.
 
 A notification is also sent to the user when a book is due on the same day.
+
+## Project Structure
+
+The project is structured as follows:
+
+- `app/src/main/java/ch/heigvd/dma/bookreturnreminder/` contains the main code of the application.
+  - `adapter/` contains the adapters for the RecyclerViews.
+  - `database/` contains the database classes.
+    - `BookDao.kt` is the Data Access Object for the Book entity.
+    - `BookDatabase.kt` is the Room database.
+  - `model/` contains the data classes.
+    - `Book.kt` is the data class for the Book entity.
+  - `repositories/` contains the repositories for the database.
+    - `BookRepository.kt` is the repository for the Book entity.
+  - `ui/` contains the UI classes.
+    - `BookViewModel.kt` is the ViewModel for the Book entity.
+  - `utils/` contains the utility classes.
+    - `DateUtils.kt` contains the date utility functions.
+  - `MainActivity.kt` is the main activity of the application where the book list is displayed.
+  - `BarcodeScanningActivity.kt` is the activity where the barcode is scanned.
+  - `InsertBookActivity.kt` is the activity where the book and the return date are added.
+- `app/src/main/res/` contains the resources of the application.
+  - `drawable/` contains the drawable resources.
+  - `layout/` contains the layout resources.
+   - `activity_barcode_scanner.xml` is the layout for the barcode scanning activity.
+   - `activity_insert_book.xml` is the layout for the insert book activity.
+   - `activity_main.xml` is the layout for the main activity.
+   - `book_item.xml` is the layout for the book item in the RecyclerView.
+   - `toolbar.xml` is the layout for the toolbar.
+  - `values/` contains the value resources.
