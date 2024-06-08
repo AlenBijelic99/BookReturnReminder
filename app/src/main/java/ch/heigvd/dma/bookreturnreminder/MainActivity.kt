@@ -50,8 +50,8 @@ class MainActivity : AppCompatActivity(), BookAdapter.OnItemClickListener {
             startActivity(intent)
         }
 
+        // Uncomment the following lines to insert some books in the database
         /*
-        // TODO: Remove this code
         bookViewModel.deleteAll()
 
         val books = listOf(
@@ -59,7 +59,8 @@ class MainActivity : AppCompatActivity(), BookAdapter.OnItemClickListener {
             Book(2, "9782266159203", "Le Horla", "Guy de Maupassant", ""),
             Book(3, "9782266161107", "Le dernier jour d'un condamné", "Victor Hugo", ""),
         )
-        books.forEach { bookViewModel.insert(it) }*/
+        books.forEach { bookViewModel.insert(it) }
+        */
 
     }
 
