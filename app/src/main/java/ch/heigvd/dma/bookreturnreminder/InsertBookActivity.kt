@@ -1,19 +1,16 @@
 package ch.heigvd.dma.bookreturnreminder
 
-import android.app.DatePickerDialog
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
-import android.widget.EditText
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import ch.heigvd.dma.bookreturnreminder.models.Book
 import ch.heigvd.dma.bookreturnreminder.ui.BookViewModel
-import java.text.SimpleDateFormat
+import ch.heigvd.dma.bookreturnreminder.utils.DateUtils
 import java.util.Calendar
-import java.util.Locale
 
 class InsertBookActivity : AppCompatActivity() {
 
@@ -40,24 +37,12 @@ class InsertBookActivity : AppCompatActivity() {
         val buttonCancel: Button = findViewById(R.id.buttonCancel)
 
         val calendar = Calendar.getInstance()
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.FRENCH)
-        textViewReturnDate.text = dateFormat.format(calendar.time)
-
-        val dateSetListener = DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
-            calendar.set(Calendar.YEAR, year)
-            calendar.set(Calendar.MONTH, month)
-            calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-            textViewReturnDate.text = dateFormat.format(calendar.time)
-        }
+        textViewReturnDate.text = DateUtils.formatDate(calendar)
 
         buttonSelectDate.setOnClickListener {
-            DatePickerDialog(
-                this,
-                dateSetListener,
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH)
-            ).show()
+            DateUtils.showDatePickerDialog(this, calendar) { selectedDate ->
+                textViewReturnDate.text = DateUtils.formatDate(selectedDate)
+            }
         }
 
         val isbnCode = intent.getStringExtra("isbnCode")

@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import ch.heigvd.dma.bookreturnreminder.R
@@ -14,7 +15,11 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class BookAdapter(private val books: List<Book>) : RecyclerView.Adapter<BookAdapter.BookViewHolder>() {
+class BookAdapter(private val books: List<Book>, private val itemClickListener: OnItemClickListener) : RecyclerView.Adapter<BookAdapter.BookViewHolder>() {
+
+    interface OnItemClickListener {
+        fun onItemClick(book: Book)
+    }
 
     class BookViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val title: TextView = itemView.findViewById(R.id.tv_item_book_title)
@@ -46,6 +51,10 @@ class BookAdapter(private val books: List<Book>) : RecyclerView.Adapter<BookAdap
         } catch (e: ParseException) {
             Log.e("BookAdapter", "Error parsing date: ${book.returnDate}", e)
             holder.returnDate.setTextColor(Color.BLACK)
+        }
+
+        holder.itemView.setOnClickListener {
+            itemClickListener.onItemClick(book)
         }
     }
 
