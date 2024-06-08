@@ -3,6 +3,7 @@ package ch.heigvd.dma.bookreturnreminder
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -37,11 +38,19 @@ class MainActivity : AppCompatActivity(), BookAdapter.OnItemClickListener {
         }
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
+        val emptyView = findViewById<TextView>(R.id.emptyView)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         bookViewModel.booksToReturn.observe(this) { books ->
             val adapter = BookAdapter(books, this)
             recyclerView.adapter = adapter
+            if (books.isEmpty()) {
+                recyclerView.visibility = RecyclerView.GONE
+                emptyView.visibility = TextView.VISIBLE
+            } else {
+                recyclerView.visibility = RecyclerView.VISIBLE
+                emptyView.visibility = TextView.GONE
+            }
         }
 
         val fab: FloatingActionButton = findViewById(R.id.fab)

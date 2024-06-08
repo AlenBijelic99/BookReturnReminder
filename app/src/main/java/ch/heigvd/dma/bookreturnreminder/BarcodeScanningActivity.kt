@@ -93,7 +93,7 @@ class BarcodeScanningActivity : AppCompatActivity() {
                 .addOnSuccessListener { barcodes ->
                     if (!isScanning) {
                         for (barcode in barcodes) {
-                            if (barcode.format == Barcode.FORMAT_EAN_13 || barcode.format == Barcode.FORMAT_EAN_8) {
+                            if (barcode.format == Barcode.FORMAT_EAN_13) {
                                 isScanning = true
                                 val isbnCode = barcode.rawValue
                                 if (isbnCode != null) {
