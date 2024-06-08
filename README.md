@@ -62,7 +62,7 @@ A notification is also sent to the user when a book is due on the same day.
 
 The project is structured as follows:
 
-- `build.gradle.kts` is the build file for the project.
+- `app/build.gradle.kts` is the build file for the application.
 - `app/src/main/AndroidManifest.xml` is the manifest file for the application.
 - `app/src/main/java/ch/heigvd/dma/bookreturnreminder/` contains the main code of the application.
   - `adapter/` contains the adapters for the RecyclerViews.
