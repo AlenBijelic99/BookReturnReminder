@@ -4,7 +4,7 @@ An Android application to remind you to return the book you borrowed from the li
 
 This application was developed as a part of the course "Développement Mobile Avancé" at the HEIG-VD.
 
-![BookReturnReminder](./figur/BookReturnReminder.png)
+![BookReturnReminder](./figures/BookReturnReminder.png)
 
 ## Features
 
