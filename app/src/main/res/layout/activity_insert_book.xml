@@ -46,20 +46,38 @@
             android:padding="8dp"
             android:textSize="16sp" />
 
-        <EditText
-            android:id="@+id/editTextReturnDate"
+        <TextView
+            android:id="@+id/textViewReturnDate"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:autofillHints="Return Date"
             android:hint="@string/return_date"
-            android:focusable="false"
-            android:clickable="true"
-            android:inputType="date"
+            android:text="Today's date"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textViewAuthor"
+            app:layout_constraintEnd_toStartOf="@id/buttonSelectDate"
+            android:padding="8dp"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/buttonSelectDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/select_date"
+            app:layout_constraintStart_toEndOf="@id/textViewReturnDate"
             app:layout_constraintTop_toBottomOf="@id/textViewAuthor"
             app:layout_constraintEnd_toEndOf="parent"
             android:padding="8dp"
             android:textSize="16sp" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/buttonContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:padding="16dp">
 
         <Button
             android:id="@+id/buttonCancel"
@@ -68,7 +86,7 @@
             android:text="@string/btn_cancel"
             android:backgroundTint="?attr/colorSecondary"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/editTextReturnDate"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toStartOf="@id/buttonSave"
             app:layout_constraintHorizontal_chainStyle="packed"
             android:layout_marginEnd="8dp"
@@ -80,11 +98,10 @@
             android:layout_height="wrap_content"
             android:text="@string/btn_save"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/editTextReturnDate"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toEndOf="@id/buttonCancel"
             android:layout_marginStart="8dp"
             android:padding="8dp" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

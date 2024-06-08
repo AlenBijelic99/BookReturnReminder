@@ -3,7 +3,8 @@
     <string name="add_book">Add Book</string>
     <string name="title">Title</string>
     <string name="author">Author</string>
-    <string name="return_date">Return Date</string>
+    <string name="select_date">Change date</string>
+    <string name="return_date">Return date</string>
     <string name="btn_save">Save</string>
     <string name="add_a_book">Add a book</string>
     <string name="btn_cancel">Cancel</string>

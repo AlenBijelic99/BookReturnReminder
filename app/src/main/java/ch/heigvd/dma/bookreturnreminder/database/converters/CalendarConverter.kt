@@ -1,7 +1,8 @@
 package ch.heigvd.dma.bookreturnreminder.database.converters
 
 import androidx.room.TypeConverter
-import java.util.*
+import java.util.Calendar
+import java.util.Date
 
 class CalendarConverter {
 
