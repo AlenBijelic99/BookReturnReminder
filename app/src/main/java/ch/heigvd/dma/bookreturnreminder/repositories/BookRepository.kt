@@ -8,7 +8,7 @@ import ch.heigvd.dma.bookreturnreminder.models.Book
 
 class BookRepository(application: Application) {
     private val bookDao: BookDao = BookDatabase.getDatabase(application).bookDao()
-    val booksToReturn: LiveData<List<Book>> = bookDao.getToReturnByAscReturnDate()
+    val booksToReturn: LiveData<List<Book>> = bookDao.getBooksToReturn()
 
     suspend fun insert(book: Book) {
         bookDao.insert(book)

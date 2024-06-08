@@ -17,6 +17,8 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
+import ch.heigvd.dma.bookreturnreminder.ui.BookViewModel
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
@@ -28,12 +30,14 @@ class BarcodeScanningActivity : AppCompatActivity() {
 
     private lateinit var cameraExecutor: ExecutorService
     private var isScanning = false
+    private lateinit var bookViewModel: BookViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_barcode_scanner)
 
         cameraExecutor = Executors.newSingleThreadExecutor()
+        bookViewModel = ViewModelProvider(this).get(BookViewModel::class.java)
 
         // Request camera permissions
         if (allPermissionsGranted()) {
@@ -91,11 +95,28 @@ class BarcodeScanningActivity : AppCompatActivity() {
                         for (barcode in barcodes) {
                             if (barcode.format == Barcode.FORMAT_EAN_13 || barcode.format == Barcode.FORMAT_EAN_8) {
                                 isScanning = true
-                                val intent = Intent(this, InsertBookActivity::class.java).apply {
-                                    putExtra("isbnCode", barcode.rawValue)
+                                val isbnCode = barcode.rawValue
+                                if (isbnCode != null) {
+                                    bookViewModel.getBookByIsbn(isbnCode).observe(this) { book ->
+                                        when {
+                                            book == null -> {
+                                                showToast("Book not found in the database")
+                                                finish()
+                                            }
+                                            book.returnDate.isNotEmpty() -> {
+                                                showToast("Book already borrowed")
+                                                finish()
+                                            }
+                                            else -> {
+                                                val intent = Intent(this, InsertBookActivity::class.java).apply {
+                                                    putExtra("isbnCode", isbnCode)
+                                                }
+                                                startActivity(intent)
+                                                finish()
+                                            }
+                                        }
+                                    }
                                 }
-                                startActivity(intent)
-                                finish()
                                 break
                             }
                         }
@@ -108,6 +129,10 @@ class BarcodeScanningActivity : AppCompatActivity() {
                     imageProxy.close()
                 }
         }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     override fun onRequestPermissionsResult(
