@@ -62,6 +62,8 @@ A notification is also sent to the user when a book is due on the same day.
 
 The project is structured as follows:
 
+- `build.gradle.kts` is the build file for the project.
+- `app/src/main/AndroidManifest.xml` is the manifest file for the application.
 - `app/src/main/java/ch/heigvd/dma/bookreturnreminder/` contains the main code of the application.
   - `adapter/` contains the adapters for the RecyclerViews.
   - `database/` contains the database classes.
@@ -87,3 +89,12 @@ The project is structured as follows:
    - `book_item.xml` is the layout for the book item in the RecyclerView.
    - `toolbar.xml` is the layout for the toolbar.
   - `values/` contains the value resources.
+
+## Authors
+
+- [Alen Bijelic - AlenBijelic99](https://github.com/AlenBijelic99)
+- [Tegest Bogale - TegestBogale](https://github.com/TegestBogale)
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
