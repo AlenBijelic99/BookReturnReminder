@@ -2,7 +2,11 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-feature android:name="android.hardware.camera" />
+
 
     <application
         android:allowBackup="true"
@@ -14,6 +18,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BookReturnReminder"
         tools:targetApi="31">
+        <service
+            android:name=".service.IBeaconMonitoringService"
+            android:foregroundServiceType="location"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            tools:ignore="ForegroundServicePermission" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -29,6 +38,9 @@
         <activity
             android:name=".BarcodeScanningActivity"
             android:exported="true" />
+
+
+
     </application>
 
 </manifest>
