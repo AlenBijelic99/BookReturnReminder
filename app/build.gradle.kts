@@ -71,4 +71,11 @@ dependencies {
 
     // ML Kit
     implementation(libs.barcode.scanning)
+
+    // iBeacon and notification dependencies
+    implementation(libs.play.services.location)
+    implementation(libs.androidx.core.ktx.v160)
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.android.beacon.library)
+
 }
