@@ -44,9 +44,9 @@ class IBeaconMonitoringService : LifecycleService() {
     // Change the UUID, major and minor to match the iBeacon used
     private val region = Region(
         "libraryRegion",
-        Identifier.parse("ebefd083-70a2-47c8-9837-e7b5634df670"),// UUID of the ibeacon used
-        Identifier.parse("1"), // Major of the ibeacon used
-        Identifier.parse("69") // Minor of the ibeacon used
+        Identifier.parse("ebefd083-70a2-47c8-9837-e7b5634df670"),
+        Identifier.parse("1"),
+        Identifier.parse("31")
     )
     private var isInRegion = false
     private var lastNotificationTime: Long = 0
