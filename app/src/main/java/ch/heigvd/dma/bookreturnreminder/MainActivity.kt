@@ -2,10 +2,7 @@ package ch.heigvd.dma.bookreturnreminder
 
 
 import android.Manifest
-import android.app.AlarmManager
 import android.app.AlertDialog
-import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -26,10 +23,10 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.Calendar
 import ch.heigvd.dma.bookreturnreminder.utils.DateUtils
 import android.util.Log
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
-import ch.heigvd.dma.bookreturnreminder.service.BookReminderBroadcastReceiver
 import ch.heigvd.dma.bookreturnreminder.service.IBeaconMonitoringService
 
 class MainActivity : AppCompatActivity(), BookAdapter.OnItemClickListener {
@@ -41,6 +38,7 @@ class MainActivity : AppCompatActivity(), BookAdapter.OnItemClickListener {
 
     private val permissionsGranted = MutableLiveData(false)
     private val bookViewModel: BookViewModel by viewModels()
+    private var foregroundPermissionsGranted = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,11 +78,15 @@ class MainActivity : AppCompatActivity(), BookAdapter.OnItemClickListener {
         }
 
         permissionsGranted.observe(this) { granted ->
-            if (granted) startIBeaconMonitoringService()
+            if (granted){
+                startIBeaconMonitoringService()
+            }else{
+                Toast.makeText(this, "Permissions not granted", Toast.LENGTH_SHORT).show()
+            }
         }
 
         // Check permissions
-        checkAndRequestPermisions()
+        checkAndRequestPermissions()
 
         // Uncomment the following lines to insert some books in the database
 
@@ -151,10 +153,14 @@ class MainActivity : AppCompatActivity(), BookAdapter.OnItemClickListener {
     // Code for Notification
     private fun startIBeaconMonitoringService() {
         val intent = Intent(this, IBeaconMonitoringService::class.java)
-        startForegroundService(intent)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent)
+        } else {
+            startService(intent)
+        }
     }
 
-    private fun checkAndRequestPermisions(): Boolean {
+    private fun checkAndRequestPermissions() {
         val permissionsNeeded = mutableListOf<String>()
         if (ContextCompat.checkSelfPermission(
                 this,
@@ -162,6 +168,7 @@ class MainActivity : AppCompatActivity(), BookAdapter.OnItemClickListener {
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             permissionsNeeded.add(Manifest.permission.ACCESS_FINE_LOCATION)
+            Log.d("Permissions", "ACCESS_FINE_LOCATION not granted")
         }
         if (ContextCompat.checkSelfPermission(
                 this,
@@ -169,6 +176,7 @@ class MainActivity : AppCompatActivity(), BookAdapter.OnItemClickListener {
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             permissionsNeeded.add(Manifest.permission.ACCESS_COARSE_LOCATION)
+            Log.d("Permissions", "ACCESS_COARSE_LOCATION not granted")
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (ContextCompat.checkSelfPermission(
@@ -177,27 +185,55 @@ class MainActivity : AppCompatActivity(), BookAdapter.OnItemClickListener {
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
                 permissionsNeeded.add(Manifest.permission.BLUETOOTH_SCAN)
+                Log.d("Permissions", "BLUETOOTH_SCAN not granted")
             }
         }
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_BACKGROUND_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            permissionsNeeded.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-        }
 
-        return if (permissionsNeeded.isNotEmpty()) {
-            ActivityCompat.requestPermissions(
-                this,
-                permissionsNeeded.toTypedArray(),
-                PERMISSION_REQUEST_CODE
-            )
-            false
+        if (permissionsNeeded.isNotEmpty()) {
+            requestForegroundPermissionsLauncher.launch(permissionsNeeded.toTypedArray())
         } else {
-            true
+            foregroundPermissionsGranted = true
+            checkAndRequestBackgroundPermissions()
         }
     }
+
+    private fun checkAndRequestBackgroundPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestBackgroundPermissionsLauncher.launch(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION))
+            } else {
+                permissionsGranted.postValue(true)
+            }
+        } else {
+            permissionsGranted.postValue(true)
+        }
+    }
+
+    private val requestForegroundPermissionsLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val deniedPermissions = permissions.filter { !it.value }
+            if (deniedPermissions.isNotEmpty()) {
+                Log.d("Permissions", "Denied foreground permissions: ${deniedPermissions.keys.joinToString()}")
+            }
+            foregroundPermissionsGranted = permissions.entries.all { it.value }
+            if (foregroundPermissionsGranted) {
+                checkAndRequestBackgroundPermissions()
+            }
+        }
+
+    private val requestBackgroundPermissionsLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val deniedPermissions = permissions.filter { !it.value }
+            if (deniedPermissions.isNotEmpty()) {
+                Log.d("Permissions", "Denied background permissions: ${deniedPermissions.keys.joinToString()}")
+            }
+            val allPermissionsGranted = permissions.entries.all { it.value }
+            permissionsGranted.postValue(allPermissionsGranted)
+        }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -211,8 +247,5 @@ class MainActivity : AppCompatActivity(), BookAdapter.OnItemClickListener {
             permissionsGranted.postValue(allPermissionsGranted)
         }
     }
-
 }
-
-
 
