@@ -17,6 +17,13 @@ import ch.heigvd.dma.bookreturnreminder.ui.BookViewModel
 import ch.heigvd.dma.bookreturnreminder.utils.DateUtils
 import java.util.Calendar
 
+/**
+ * DMA project - Managing reminder for borrowed Books at the Library - scan book barcode
+ * and detection of iBeacons in a foreground service.
+ * @author Bijelic Alen & Bogale Tegest
+ * @Date 10.06.2024
+ * Activity for inserting a book into the database.
+ */
 class InsertBookActivity : AppCompatActivity() {
 
     private val bookViewModel: BookViewModel by viewModels()

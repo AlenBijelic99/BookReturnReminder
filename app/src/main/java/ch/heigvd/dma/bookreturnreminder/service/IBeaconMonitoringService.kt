@@ -20,16 +20,22 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.altbeacon.beacon.*
 
-
+/**
+ * DMA project - Managing reminder for borrowed Books at the Library - scan book barcode
+ * and detection of iBeacons in a foreground service.
+ * @author Bijelic Alen & Bogale Tegest
+ * @Date 10.06.2024
+ * Service that monitors iBeacons & send notifications for book returns.
+ */
 class IBeaconMonitoringService : LifecycleService() {
 
     private lateinit var beaconManager: BeaconManager
     private lateinit var bookRepository: BookRepository
     private val region = Region(
         "libraryRegion",
-        Identifier.parse("ebefd083-70a2-47c8-9837-e7b5634df670"),
-        Identifier.parse("1"),
-        Identifier.parse("69")
+        Identifier.parse("ebefd083-70a2-47c8-9837-e7b5634df670"),// UUID of the ibeacon used
+        Identifier.parse("1"), // Major of the ibeacon used
+        Identifier.parse("69") // Minor of the ibeacon used
     )
 
     override fun onCreate() {
@@ -43,11 +49,14 @@ class IBeaconMonitoringService : LifecycleService() {
 
     }
 
+    /**
+     * Starts the service in the foreground with a notification.
+     */
     private fun startForegroundService() {
         Log.d("IBeaconMonitoringService", "Starting foreground service")
         val channelId = "foreground_service_channel"
         val channelName = "Foreground Service"
-        val importance = NotificationManager.IMPORTANCE_HIGH
+        val importance = NotificationManager.IMPORTANCE_LOW
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -70,6 +79,9 @@ class IBeaconMonitoringService : LifecycleService() {
         startForeground(1, notification)
     }
 
+    /**
+     * Sets up the beacon manager to monitor and range the beacons.
+     */
     private fun setupBeaconManager() {
         Log.d("IBeaconMonitoringService", "Setting up Beacon Manager")
         beaconManager = BeaconManager.getInstanceForApplication(this)
@@ -117,6 +129,9 @@ class IBeaconMonitoringService : LifecycleService() {
         }
     }
 
+    /**
+     * Sends a notification if there are books due to be returned.
+     */
     private fun sendNotification() {
         Log.d("IBeaconMonitoringService", "Started monitoring and ranging beacons")
         lifecycleScope.launch(Dispatchers.IO) {
@@ -162,11 +177,17 @@ class IBeaconMonitoringService : LifecycleService() {
     }
 
 
+    /**
+     * Gets the list of books that are due to be returned.
+     */
     private suspend fun getDueBooks(): List<Book> {
         return bookRepository.getBooksListToReturn()
     }
 
 
+    /**
+     * Stops monitoring and ranging the beacons when the service is destroyed.
+     */
     override fun onDestroy() {
         super.onDestroy()
         try {

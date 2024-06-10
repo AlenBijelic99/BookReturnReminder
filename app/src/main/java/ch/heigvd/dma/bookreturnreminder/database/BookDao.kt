@@ -6,6 +6,14 @@ import androidx.room.Insert
 import androidx.room.Query
 import ch.heigvd.dma.bookreturnreminder.models.Book
 
+/**
+ * DMA project - Managing reminder for borrowed Books at the Library - scan book barcode
+ * and detection of iBeacons in a foreground service.
+ * @author Bijelic Alen & Bogale Tegest
+ * @Date 10.06.2024
+ * Data access object for the Book entity.
+
+ */
 @Dao
 interface BookDao {
     @Insert

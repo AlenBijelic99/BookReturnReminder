@@ -24,10 +24,28 @@ import java.util.Calendar
 import ch.heigvd.dma.bookreturnreminder.utils.DateUtils
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import ch.heigvd.dma.bookreturnreminder.service.IBeaconMonitoringService
+/**
+ * DMA project - Managing reminder for borrowed Books at the Library - scan book barcode
+ * and detection of iBeacons in a foreground service.
+ * @author Bijelic Alen & Bogale Tegest
+ * @Date 10.06.2024
+ * Main activity that manages borrowed books and iBeacon monitoring.
+ * The activity does the following:
+ *      - displays the list of borrowed books and allows the user to manage them.
+ *      - allows user to mark a book as returned or set a return date.
+ *      - allows user can also scan a book barcode to add a new book to the list.
+ *      - starts the iBeacon monitoring service.
+ *      - requests the necessary permissions to start the iBeacon monitoring service.
+ *      - inserts some books in the database.
+ *      - displays a notification when a book is returned.
+ *      - displays a notification when an iBeacon is detected.
+ *      - displays a notification when the app is in the foreground.
+ *      - display a notification to remind the user to return a book when the user is near the library (ibeacon configured)
+ *      - sets reminder when a book due date is reached ( 3 days or less before the due date)
+ */
 
 class MainActivity : AppCompatActivity(), BookAdapter.OnItemClickListener {
 
@@ -88,15 +106,15 @@ class MainActivity : AppCompatActivity(), BookAdapter.OnItemClickListener {
             startActivity(intent)
         }
 
+        // Observe permissions granted to start the iBeacon monitoring service
         permissionsGranted.observe(this) { granted ->
             if (granted) startIBeaconMonitoringService()
         }
 
-        // Check permissions
+        // Check and request necessary permissions
         checkAndRequestPermissions()
 
         // Uncomment the following lines to insert some books in the database
-
         bookViewModel.deleteAll()
 
         val books = listOf(
@@ -157,14 +175,9 @@ class MainActivity : AppCompatActivity(), BookAdapter.OnItemClickListener {
     }
 
 
-    // Code for Notification
     private fun startIBeaconMonitoringService() {
         val intent = Intent(this, IBeaconMonitoringService::class.java)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(intent)
-        } else {
-            startService(intent)
-        }
+        startForegroundService(intent)
     }
 
     private fun checkAndRequestPermissions() {
@@ -205,6 +218,9 @@ class MainActivity : AppCompatActivity(), BookAdapter.OnItemClickListener {
     }
 
 
+    /**
+     * Handles the result of the permission request.
+     */
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,

@@ -8,6 +8,13 @@ import ch.heigvd.dma.bookreturnreminder.models.Book
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+/**
+ * DMA project - Managing reminder for borrowed Books at the Library - scan book barcode
+ * and detection of iBeacons in a foreground service.
+ * @author Bijelic Alen & Bogale Tegest
+ * @Date 10.06.2024
+ * Repository for the Book entity.
+ */
 class BookRepository(application: Application) {
     private val bookDao: BookDao = BookDatabase.getDatabase(application).bookDao()
     val booksToReturn: LiveData<List<Book>> = bookDao.getBooksToReturn()
