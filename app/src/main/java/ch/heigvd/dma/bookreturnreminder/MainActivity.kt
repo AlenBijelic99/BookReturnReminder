@@ -1,10 +1,14 @@
 package ch.heigvd.dma.bookreturnreminder
 
+
+import android.Manifest
 import android.app.AlarmManager
 import android.app.AlertDialog
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.widget.TextView
 import android.widget.Toast
@@ -22,13 +26,20 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.Calendar
 import ch.heigvd.dma.bookreturnreminder.utils.DateUtils
 import android.util.Log
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.MutableLiveData
 import ch.heigvd.dma.bookreturnreminder.service.BookReminderBroadcastReceiver
 import ch.heigvd.dma.bookreturnreminder.service.IBeaconMonitoringService
 
 class MainActivity : AppCompatActivity(), BookAdapter.OnItemClickListener {
 
 
+    companion object {
+        private const val PERMISSION_REQUEST_CODE = 1001
+    }
 
+    private val permissionsGranted = MutableLiveData(false)
     private val bookViewModel: BookViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -100,9 +111,14 @@ class MainActivity : AppCompatActivity(), BookAdapter.OnItemClickListener {
             }
         }
 
-        // Start the iBeacon monitoring service
-        startIBeaconMonitoringService()
+        // Start the iBeacon monitoring service after checking permissions
+        if (checkAndRequestPermisions()) {
+            startIBeaconMonitoringService()
+        }
 
+        permissionsGranted.observe(this) { granted ->
+            if (granted) startIBeaconMonitoringService()
+        }
     }
 
     override fun onItemClick(book: Book) {
@@ -169,6 +185,64 @@ class MainActivity : AppCompatActivity(), BookAdapter.OnItemClickListener {
     private fun startIBeaconMonitoringService() {
         val intent = Intent(this, IBeaconMonitoringService::class.java)
         startForegroundService(intent)
+    }
+
+    private fun checkAndRequestPermisions(): Boolean {
+        val permissionsNeeded = mutableListOf<String>()
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            permissionsNeeded.add(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            permissionsNeeded.add(Manifest.permission.ACCESS_COARSE_LOCATION)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.BLUETOOTH_SCAN
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                permissionsNeeded.add(Manifest.permission.BLUETOOTH_SCAN)
+            }
+        }
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            permissionsNeeded.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        }
+
+        return if (permissionsNeeded.isNotEmpty()) {
+            ActivityCompat.requestPermissions(
+                this,
+                permissionsNeeded.toTypedArray(),
+                PERMISSION_REQUEST_CODE
+            )
+            false
+        } else {
+            true
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            val allPermissionsGranted =
+                grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }
+            permissionsGranted.postValue(allPermissionsGranted)
+        }
     }
 
 }
