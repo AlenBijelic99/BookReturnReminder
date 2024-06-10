@@ -23,8 +23,10 @@ import java.util.Calendar
 import ch.heigvd.dma.bookreturnreminder.utils.DateUtils
 import android.util.Log
 import ch.heigvd.dma.bookreturnreminder.service.BookReminderBroadcastReceiver
+import ch.heigvd.dma.bookreturnreminder.service.IBeaconMonitoringService
 
 class MainActivity : AppCompatActivity(), BookAdapter.OnItemClickListener {
+
 
 
     private val bookViewModel: BookViewModel by viewModels()
@@ -98,6 +100,9 @@ class MainActivity : AppCompatActivity(), BookAdapter.OnItemClickListener {
             }
         }
 
+        // Start the iBeacon monitoring service
+        startIBeaconMonitoringService()
+
     }
 
     override fun onItemClick(book: Book) {
@@ -161,6 +166,10 @@ class MainActivity : AppCompatActivity(), BookAdapter.OnItemClickListener {
         }
     }
 
+    private fun startIBeaconMonitoringService() {
+        val intent = Intent(this, IBeaconMonitoringService::class.java)
+        startForegroundService(intent)
+    }
 
 }
 
