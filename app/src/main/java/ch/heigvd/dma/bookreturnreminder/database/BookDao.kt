@@ -22,4 +22,7 @@ interface BookDao {
 
     @Query("UPDATE books SET return_date = :returnDate WHERE isbn_code = :isbnCode")
     suspend fun update(isbnCode: String, returnDate: String)
+
+    @Query("SELECT * FROM books WHERE return_date != ''")
+    suspend fun getBooksListToReturn(): List<Book>
 }

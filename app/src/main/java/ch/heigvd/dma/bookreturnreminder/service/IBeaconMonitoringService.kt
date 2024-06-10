@@ -1,5 +1,6 @@
 package ch.heigvd.dma.bookreturnreminder.service
 
+import kotlinx.coroutines.suspendCancellableCoroutine
 import android.app.Application
 import android.app.Notification
 import android.app.NotificationChannel
@@ -11,6 +12,8 @@ import android.os.RemoteException
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import ch.heigvd.dma.bookreturnreminder.MainActivity
 import ch.heigvd.dma.bookreturnreminder.R
@@ -18,35 +21,50 @@ import ch.heigvd.dma.bookreturnreminder.models.Book
 import ch.heigvd.dma.bookreturnreminder.repositories.BookRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.altbeacon.beacon.*
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import kotlin.coroutines.resume
 
 class IBeaconMonitoringService : LifecycleService() {
 
     private lateinit var beaconManager: BeaconManager
     private lateinit var bookRepository: BookRepository
-    private val region = Region("libraryRegion", Identifier.parse("ebefd083-70a2-47c8-9837-e7b5634df670"), Identifier.parse("1"), Identifier.parse("69"))
+    private val region = Region(
+        "libraryRegion",
+        Identifier.parse("ebefd083-70a2-47c8-9837-e7b5634df670"),
+        Identifier.parse("1"),
+        Identifier.parse("69")
+    )
 
     override fun onCreate() {
         super.onCreate()
+        Log.d("IBeaconMonitoringService", "Service created")
         bookRepository = BookRepository(applicationContext as Application)
         startForegroundService()
         setupBeaconManager()
+
         Log.d("IBeaconMonitoringService", "Service created and foreground service started")
 
     }
 
     private fun startForegroundService() {
+        Log.d("IBeaconMonitoringService", "Starting foreground service")
         val channelId = "foreground_service_channel"
         val channelName = "Foreground Service"
         val importance = NotificationManager.IMPORTANCE_HIGH
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         val channel = NotificationChannel(channelId, channelName, importance)
         notificationManager.createNotificationChannel(channel)
 
         val notificationIntent = Intent(this, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        val pendingIntent = PendingIntent.getActivity(
+            this, 0, notificationIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
 
         val notification = NotificationCompat.Builder(this, channelId)
             .setContentTitle("iBeacon Monitoring Service")
@@ -57,7 +75,8 @@ class IBeaconMonitoringService : LifecycleService() {
 
         startForeground(1, notification)
     }
-    private  fun setupBeaconManager() {
+
+    private fun setupBeaconManager() {
         Log.d("IBeaconMonitoringService", "Setting up Beacon Manager")
         beaconManager = BeaconManager.getInstanceForApplication(this)
         beaconManager.beaconParsers.add(
@@ -69,6 +88,7 @@ class IBeaconMonitoringService : LifecycleService() {
                 Log.d("IBeaconMonitoringService", "Entered region: ${region.id1}")
                 sendNotification()
             }
+
             override fun didExitRegion(region: Region) {
                 Log.d("IBeaconMonitoringService", "Exited region: ${region.id1}")
             }
@@ -102,6 +122,7 @@ class IBeaconMonitoringService : LifecycleService() {
             e.printStackTrace()
         }
     }
+
     private fun sendNotification() {
         Log.d("IBeaconMonitoringService", "Started monitoring and ranging beacons")
         lifecycleScope.launch(Dispatchers.IO) {
@@ -118,29 +139,36 @@ class IBeaconMonitoringService : LifecycleService() {
                 val channel = NotificationChannel(channelId, channelName, importance)
                 notificationManager.createNotificationChannel(channel)
 
-                val notificationIntent = Intent(this@IBeaconMonitoringService, MainActivity::class.java)
+                val notificationIntent =
+                    Intent(this@IBeaconMonitoringService, MainActivity::class.java)
                 val pendingIntent = PendingIntent.getActivity(
-                    this@IBeaconMonitoringService, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT
+                    this@IBeaconMonitoringService,
+                    0,
+                    notificationIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                 )
 
-                val notification: Notification = NotificationCompat.Builder(this@IBeaconMonitoringService, channelId)
-                    .setContentTitle("Books Due Reminder")
-                    .setContentText("Books due: $booksList")
-                    .setSmallIcon(R.drawable.ic_notification)
-                    .setContentIntent(pendingIntent)
-                    .build()
+                val notification: Notification =
+                    NotificationCompat.Builder(this@IBeaconMonitoringService, channelId)
+                        .setContentTitle("Books Due Reminder")
+                        .setContentText("Books due: $booksList")
+                        .setSmallIcon(R.drawable.ic_notification)
+                        .setContentIntent(pendingIntent)
+                        .build()
 
                 notificationManager.notify(1, notification)
                 Log.d("IBeaconMonitoringService", "Notification sent: $booksList")
-            }else{
+            } else {
                 Log.d("IBeaconMonitoringService", "No due books found")
             }
         }
     }
 
-    private  fun getDueBooks(): List<Book> {
-        return bookRepository.booksToReturn.value ?: emptyList()
+
+    private suspend fun getDueBooks(): List<Book> {
+        return bookRepository.getBooksListToReturn()
     }
+
 
     override fun onDestroy() {
         super.onDestroy()
