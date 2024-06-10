@@ -77,5 +77,7 @@ dependencies {
     implementation(libs.androidx.core.ktx.v160)
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.android.beacon.library)
+    implementation(libs.androidx.lifecycle.service)
+
 
 }
