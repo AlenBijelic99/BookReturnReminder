@@ -1,6 +1,9 @@
 package ch.heigvd.dma.bookreturnreminder
 
+import android.app.AlarmManager
 import android.app.AlertDialog
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
@@ -18,8 +21,11 @@ import ch.heigvd.dma.bookreturnreminder.ui.BookViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.Calendar
 import ch.heigvd.dma.bookreturnreminder.utils.DateUtils
+import android.util.Log
+import ch.heigvd.dma.bookreturnreminder.service.BookReminderBroadcastReceiver
 
 class MainActivity : AppCompatActivity(), BookAdapter.OnItemClickListener {
+
 
     private val bookViewModel: BookViewModel by viewModels()
 
@@ -60,16 +66,37 @@ class MainActivity : AppCompatActivity(), BookAdapter.OnItemClickListener {
         }
 
         // Uncomment the following lines to insert some books in the database
-        /*
+
         bookViewModel.deleteAll()
 
         val books = listOf(
-            Book(1, "9782212566659", "Blockchain: La révolution de la confiance", "Laurent Leloup", ""),
+            Book(
+                1,
+                "9782212566659",
+                "Blockchain: La révolution de la confiance",
+                "Laurent Leloup",
+                ""
+            ),
             Book(2, "9782266159203", "Le Horla", "Guy de Maupassant", ""),
             Book(3, "9782266161107", "Le dernier jour d'un condamné", "Victor Hugo", ""),
+            Book(4, "9782409020865", "Flexbox et Grid", "Christophe AUBRY", ""),
+            Book(
+                5,
+                "9789389932072",
+                "Learn angular in 24 hours",
+                "Lakshmi Kamala Thota",
+                "2024-06-10"
+            ),
         )
         books.forEach { bookViewModel.insert(it) }
-        */
+
+
+        // Schedule reminder notifications for all books
+        bookViewModel.booksToReturn.observe(this) { toReturnBooks ->
+            toReturnBooks.forEach { toReturnBook ->
+                scheduleReminderNotification(toReturnBook)
+            }
+        }
 
     }
 
@@ -105,4 +132,37 @@ class MainActivity : AppCompatActivity(), BookAdapter.OnItemClickListener {
         bookViewModel.update(book.isbnCode, "")
         Toast.makeText(this, "Book returned", Toast.LENGTH_SHORT).show()
     }
+
+
+    // Code for Notification
+    private fun scheduleReminderNotification(book: Book) {
+        if (book.returnDate.isNotEmpty()) {
+            val calendar = DateUtils.parseDate(book.returnDate)
+            calendar.add(Calendar.DAY_OF_YEAR, -3) // Remind 3 days before due date
+            val reminderTime = calendar.timeInMillis
+
+            Log.d("MainActivity", "Setting reminder for book: ${book.title} at $reminderTime")
+
+            val intent = Intent(this, BookReminderBroadcastReceiver::class.java).apply {
+                putExtra("bookTitle", book.title)
+            }
+
+            val pendingIntent = PendingIntent.getBroadcast(
+                this,
+                book.id, // Use book.id as the request code to ensure uniqueness
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+            val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            alarmManager.set(AlarmManager.RTC_WAKEUP, reminderTime, pendingIntent)
+
+            Log.d("MainActivity", "Alarm set for book: ${book.title}")
+        }
+    }
+
+
 }
+
+
+
