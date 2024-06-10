@@ -79,14 +79,12 @@ class MainActivity : AppCompatActivity(), BookAdapter.OnItemClickListener {
             startActivity(intent)
         }
 
-        // Start the iBeacon monitoring service after checking permissions
-        if (checkAndRequestPermisions()) {
-            startIBeaconMonitoringService()
-        }
-
         permissionsGranted.observe(this) { granted ->
             if (granted) startIBeaconMonitoringService()
         }
+
+        // Check permissions
+        checkAndRequestPermisions()
 
         // Uncomment the following lines to insert some books in the database
 
