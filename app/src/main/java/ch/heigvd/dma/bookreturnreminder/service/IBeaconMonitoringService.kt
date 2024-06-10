@@ -1,6 +1,5 @@
 package ch.heigvd.dma.bookreturnreminder.service
 
-import kotlinx.coroutines.suspendCancellableCoroutine
 import android.app.Application
 import android.app.Notification
 import android.app.NotificationChannel
@@ -12,8 +11,6 @@ import android.os.RemoteException
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import ch.heigvd.dma.bookreturnreminder.MainActivity
 import ch.heigvd.dma.bookreturnreminder.R
@@ -21,11 +18,8 @@ import ch.heigvd.dma.bookreturnreminder.models.Book
 import ch.heigvd.dma.bookreturnreminder.repositories.BookRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.altbeacon.beacon.*
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
-import kotlin.coroutines.resume
+
 
 class IBeaconMonitoringService : LifecycleService() {
 
@@ -148,15 +142,18 @@ class IBeaconMonitoringService : LifecycleService() {
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                 )
 
+                // Generate a unique notification ID
+                val notificationId = System.currentTimeMillis().toInt()
+
                 val notification: Notification =
                     NotificationCompat.Builder(this@IBeaconMonitoringService, channelId)
-                        .setContentTitle("Books Due Reminder")
+                        .setContentTitle("iBeacons Books Due Reminder")
                         .setContentText("Books due: $booksList")
                         .setSmallIcon(R.drawable.ic_notification)
                         .setContentIntent(pendingIntent)
                         .build()
 
-                notificationManager.notify(1, notification)
+                notificationManager.notify(notificationId, notification)
                 Log.d("IBeaconMonitoringService", "Notification sent: $booksList")
             } else {
                 Log.d("IBeaconMonitoringService", "No due books found")

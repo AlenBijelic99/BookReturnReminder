@@ -5,7 +5,6 @@ import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import ch.heigvd.dma.bookreturnreminder.R
@@ -23,10 +22,8 @@ class BookReminderBroadcastReceiver : BroadcastReceiver() {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         val channelId = "reminder_channel"
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(channelId, "Reminder Channel", NotificationManager.IMPORTANCE_HIGH)
-            notificationManager.createNotificationChannel(channel)
-        }
+        val channel = NotificationChannel(channelId, "Reminder Channel", NotificationManager.IMPORTANCE_HIGH)
+        notificationManager.createNotificationChannel(channel)
 
         val notification = NotificationCompat.Builder(context, channelId)
             .setContentTitle(title)
@@ -34,7 +31,10 @@ class BookReminderBroadcastReceiver : BroadcastReceiver() {
             .setSmallIcon(R.drawable.ic_notification)
             .build()
 
-        notificationManager.notify(1, notification)
+        // Generate a unique notification ID
+        val notificationId = System.currentTimeMillis().toInt()
+
+        notificationManager.notify(notificationId, notification)
         Log.d("BookReminderBroadcastReceiver", "Notification sent: $title")
     }
 }
