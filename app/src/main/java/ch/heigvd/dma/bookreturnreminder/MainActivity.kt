@@ -70,12 +70,22 @@ class MainActivity : AppCompatActivity(), BookAdapter.OnItemClickListener {
                 recyclerView.visibility = RecyclerView.VISIBLE
                 emptyView.visibility = TextView.GONE
             }
+
         }
 
         val fab: FloatingActionButton = findViewById(R.id.fab)
         fab.setOnClickListener {
             val intent = Intent(this, BarcodeScanningActivity::class.java)
             startActivity(intent)
+        }
+
+        // Start the iBeacon monitoring service after checking permissions
+        if (checkAndRequestPermisions()) {
+            startIBeaconMonitoringService()
+        }
+
+        permissionsGranted.observe(this) { granted ->
+            if (granted) startIBeaconMonitoringService()
         }
 
         // Uncomment the following lines to insert some books in the database
@@ -98,27 +108,12 @@ class MainActivity : AppCompatActivity(), BookAdapter.OnItemClickListener {
                 "9789389932072",
                 "Learn angular in 24 hours",
                 "Lakshmi Kamala Thota",
-                "2024-06-10"
+                ""
             ),
         )
         books.forEach { bookViewModel.insert(it) }
 
 
-        // Schedule reminder notifications for all books
-        bookViewModel.booksToReturn.observe(this) { toReturnBooks ->
-            toReturnBooks.forEach { toReturnBook ->
-                scheduleReminderNotification(toReturnBook)
-            }
-        }
-
-        // Start the iBeacon monitoring service after checking permissions
-        if (checkAndRequestPermisions()) {
-            startIBeaconMonitoringService()
-        }
-
-        permissionsGranted.observe(this) { granted ->
-            if (granted) startIBeaconMonitoringService()
-        }
     }
 
     override fun onItemClick(book: Book) {
@@ -156,32 +151,6 @@ class MainActivity : AppCompatActivity(), BookAdapter.OnItemClickListener {
 
 
     // Code for Notification
-    private fun scheduleReminderNotification(book: Book) {
-        if (book.returnDate.isNotEmpty()) {
-            val calendar = DateUtils.parseDate(book.returnDate)
-            calendar.add(Calendar.DAY_OF_YEAR, -3) // Remind 3 days before due date
-            val reminderTime = calendar.timeInMillis
-
-            Log.d("MainActivity", "Setting reminder for book: ${book.title} at $reminderTime")
-
-            val intent = Intent(this, BookReminderBroadcastReceiver::class.java).apply {
-                putExtra("bookTitle", book.title)
-            }
-
-            val pendingIntent = PendingIntent.getBroadcast(
-                this,
-                book.id, // Use book.id as the request code to ensure uniqueness
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-
-            val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            alarmManager.set(AlarmManager.RTC_WAKEUP, reminderTime, pendingIntent)
-
-            Log.d("MainActivity", "Alarm set for book: ${book.title}")
-        }
-    }
-
     private fun startIBeaconMonitoringService() {
         val intent = Intent(this, IBeaconMonitoringService::class.java)
         startForegroundService(intent)
