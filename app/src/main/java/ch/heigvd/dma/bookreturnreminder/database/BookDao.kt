@@ -33,4 +33,7 @@ interface BookDao {
 
     @Query("SELECT * FROM books WHERE return_date != ''")
     suspend fun getBooksListToReturn(): List<Book>
+
+    @Query("SELECT COUNT(*) FROM books")
+    suspend fun getBooksCount(): Int
 }

@@ -27,6 +27,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import ch.heigvd.dma.bookreturnreminder.service.IBeaconMonitoringService
+
 /**
  * DMA project - Managing reminder for borrowed Books at the Library - scan book barcode
  * and detection of iBeacons in a foreground service.
@@ -62,8 +63,15 @@ class MainActivity : AppCompatActivity(), BookAdapter.OnItemClickListener {
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             val deniedPermissions = permissions.filter { !it.value }
             if (deniedPermissions.isNotEmpty()) {
-                Log.d("Permissions", "Denied foreground permissions: ${deniedPermissions.keys.joinToString()}")
-                Toast.makeText(this, "Foreground permissions denied: ${deniedPermissions.keys.joinToString()}", Toast.LENGTH_LONG).show()
+                Log.d(
+                    "Permissions",
+                    "Denied foreground permissions: ${deniedPermissions.keys.joinToString()}"
+                )
+                Toast.makeText(
+                    this,
+                    "Foreground permissions denied: ${deniedPermissions.keys.joinToString()}",
+                    Toast.LENGTH_LONG
+                ).show()
             }
             foregroundPermissionsGranted = permissions.entries.all { it.value }
             permissionsGranted.postValue(foregroundPermissionsGranted)
@@ -113,31 +121,6 @@ class MainActivity : AppCompatActivity(), BookAdapter.OnItemClickListener {
 
         // Check and request necessary permissions
         checkAndRequestPermissions()
-
-        // Uncomment the following lines to insert some books in the database
-        bookViewModel.deleteAll()
-
-        val books = listOf(
-            Book(
-                1,
-                "9782212566659",
-                "Blockchain: La révolution de la confiance",
-                "Laurent Leloup",
-                ""
-            ),
-            Book(2, "9782266159203", "Le Horla", "Guy de Maupassant", ""),
-            Book(3, "9782266161107", "Le dernier jour d'un condamné", "Victor Hugo", ""),
-            Book(4, "9782409020865", "Flexbox et Grid", "Christophe AUBRY", ""),
-            Book(
-                5,
-                "9789389932072",
-                "Learn angular in 24 hours",
-                "Lakshmi Kamala Thota",
-                ""
-            ),
-        )
-        books.forEach { bookViewModel.insert(it) }
-
 
     }
 
