@@ -29,6 +29,7 @@ import org.altbeacon.beacon.*
  * Service that monitors iBeacons & send notifications for book returns.
  * Notification are sent based on the following conditions:
  *
+ * - when the user is within 5 meters of the beacon.
  * - every hour if the user remains in the region and the message content hasn't changed.
  * - when the user re-enters the region, regardless of the message content has not change.
  * - when message content has changed regardless of the time interval.
@@ -86,7 +87,7 @@ class IBeaconMonitoringService : LifecycleService() {
         val notification = NotificationCompat.Builder(this, channelId)
             .setContentTitle("iBeacon Monitoring Service")
             .setContentText("Monitoring for library iBeacons")
-            .setSmallIcon(R.drawable.ic_notification)
+            .setSmallIcon(R.drawable.ic_ibeacon_notification)
             .setContentIntent(pendingIntent)
             .build()
 
@@ -231,7 +232,7 @@ class IBeaconMonitoringService : LifecycleService() {
                 val notification: Notification = NotificationCompat.Builder(this@IBeaconMonitoringService, channelId)
                     .setContentTitle("iBeacons Books Due Reminder")
                     .setContentText("Books due: $booksList")
-                    .setSmallIcon(R.drawable.ic_notification)
+                    .setSmallIcon(R.drawable.ic_ibeacon_notification)
                     .setContentIntent(pendingIntent)
                     .build()
 

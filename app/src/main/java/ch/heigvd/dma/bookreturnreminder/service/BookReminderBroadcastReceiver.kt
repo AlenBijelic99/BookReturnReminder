@@ -44,7 +44,7 @@ class BookReminderBroadcastReceiver : BroadcastReceiver() {
         val notification = NotificationCompat.Builder(context, channelId)
             .setContentTitle(title)
             .setContentText(message)
-            .setSmallIcon(R.drawable.ic_notification)
+            .setSmallIcon(R.drawable.ic_reminder_notification)
             .build()
 
         // Generate a unique notification ID
