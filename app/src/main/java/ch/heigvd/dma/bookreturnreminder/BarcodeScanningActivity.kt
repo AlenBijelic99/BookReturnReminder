@@ -26,6 +26,14 @@ import com.google.mlkit.vision.common.InputImage
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+/**
+ * DMA project - Managing reminder for borrowed Books at the Library - scan book barcode
+ * and detection of iBeacons in a foreground service.
+ * @author Bijelic Alen & Bogale Tegest
+ * @Date 10.06.2024
+ * Activity for scanning a book barcode.
+
+ */
 class BarcodeScanningActivity : AppCompatActivity() {
 
     private lateinit var cameraExecutor: ExecutorService
@@ -103,12 +111,17 @@ class BarcodeScanningActivity : AppCompatActivity() {
                                                 showToast("Book not found in the database")
                                                 finish()
                                             }
+
                                             book.returnDate.isNotEmpty() -> {
                                                 showToast("Book already borrowed")
                                                 finish()
                                             }
+
                                             else -> {
-                                                val intent = Intent(this, InsertBookActivity::class.java).apply {
+                                                val intent = Intent(
+                                                    this,
+                                                    InsertBookActivity::class.java
+                                                ).apply {
                                                     putExtra("isbnCode", isbnCode)
                                                 }
                                                 startActivity(intent)
@@ -143,7 +156,8 @@ class BarcodeScanningActivity : AppCompatActivity() {
             if (allPermissionsGranted()) {
                 startCamera()
             } else {
-                Toast.makeText(this, "Permissions not granted by the user.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Permissions not granted by the user.", Toast.LENGTH_SHORT)
+                    .show()
                 finish()
             }
         }

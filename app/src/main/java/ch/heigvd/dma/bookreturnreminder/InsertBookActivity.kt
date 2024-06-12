@@ -1,5 +1,9 @@
 package ch.heigvd.dma.bookreturnreminder
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -8,10 +12,18 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import ch.heigvd.dma.bookreturnreminder.models.Book
+import ch.heigvd.dma.bookreturnreminder.service.BookReminderBroadcastReceiver
 import ch.heigvd.dma.bookreturnreminder.ui.BookViewModel
 import ch.heigvd.dma.bookreturnreminder.utils.DateUtils
 import java.util.Calendar
 
+/**
+ * DMA project - Managing reminder for borrowed Books at the Library - scan book barcode
+ * and detection of iBeacons in a foreground service.
+ * @author Bijelic Alen & Bogale Tegest
+ * @Date 10.06.2024
+ * Activity for inserting a book into the database.
+ */
 class InsertBookActivity : AppCompatActivity() {
 
     private val bookViewModel: BookViewModel by viewModels()
@@ -64,11 +76,37 @@ class InsertBookActivity : AppCompatActivity() {
         buttonSave.setOnClickListener {
             currentBook.returnDate = textViewReturnDate.text.toString()
             bookViewModel.update(currentBook.isbnCode, currentBook.returnDate)
+            scheduleReminderNotification(currentBook)
             finish()
         }
 
         buttonCancel.setOnClickListener {
             finish()
+        }
+    }
+    private fun scheduleReminderNotification(book: Book) {
+        if (book.returnDate.isNotEmpty()) {
+            val calendar = DateUtils.parseDate(book.returnDate)
+            calendar.add(Calendar.DAY_OF_YEAR, -3) // Remind 3 days before due date
+            val reminderTime = calendar.timeInMillis
+
+            Log.d("InsertBookActivity", "Setting reminder for book: ${book.title} at $reminderTime")
+
+            val intent = Intent(this, BookReminderBroadcastReceiver::class.java).apply {
+                putExtra("bookTitle", book.title)
+            }
+
+            val pendingIntent = PendingIntent.getBroadcast(
+                this,
+                book.id, // Use book.id as the request code to ensure uniqueness
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+            val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            alarmManager.set(AlarmManager.RTC_WAKEUP, reminderTime, pendingIntent)
+
+            Log.d("InsertBookActivity", "Alarm set for book: ${book.title}")
         }
     }
 }

@@ -6,6 +6,14 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
+/**
+ * DMA project - Managing reminder for borrowed Books at the Library - scan book barcode
+ * and detection of iBeacons in a foreground service.
+ * @author Bijelic Alen & Bogale Tegest
+ * @Date 10.06.2024
+ * Utility class for date formatting and parsing.
+
+ */
 object DateUtils {
 
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
